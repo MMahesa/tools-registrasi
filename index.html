@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrasi Pelanggan NOC</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>NOC Registration System</h1>
+        <p>Sistem Registrasi Pelanggan </p>
+      </div>
+
+      <div class="main-content">
+        <!-- Form Input -->
+        <div class="card">
+          <h2>Form Registrasi</h2>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nama">Nama Pelanggan</label>
+              <input
+                type="text"
+                id="nama"
+                placeholder="Masukkan nama lengkap"
+              />
+            </div>
+            <div class="form-group">
+              <label for="sn">Nomor Seri</label>
+              <input type="text" id="sn" placeholder="SN123456789" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="mac">Alamat MAC</label>
+              <input type="text" id="mac" placeholder="00:11:22:33:44:55" />
+            </div>
+            <div class="form-group">
+              <label for="redaman">Redaman (dBm)</label>
+              <input type="text" id="redaman" placeholder="-15.5" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                placeholder="Masukkan username"
+              />
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="text"
+                id="password"
+                placeholder="Masukkan password"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vlan">VLAN ID</label>
+              <input type="text" id="vlan" placeholder="100" />
+            </div>
+            <div class="form-group">
+              <label for="tikor">Koordinat</label>
+              <input
+                type="text"
+                id="tikor"
+                placeholder="-6.123456, 106.789012"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="odp">Lokasi ODP</label>
+              <input type="text" id="odp" placeholder="ODP-001/1/1" />
+            </div>
+            <div class="form-group">
+              <label for="teknisi">Tim Teknisi</label>
+              <select id="teknisi">
+                <option value="">Pilih Tim Teknisi</option>
+                <option value="TIM 1">TIM 1</option>
+                <option value="TIM 2">TIM 2</option>
+                <option value="TIM 3">TIM 3</option>
+                <option value="TIM 4">TIM 4</option>
+                <option value="TIM 5">TIM 5</option>
+                <option value="TIM 6">TIM 6</option>
+                <option value="TIM 7">TIM 7</option>
+                <option value="TIM 8">TIM 8</option>
+                <option value="TIM 9">TIM 9</option>
+                <option value="TIM 10">TIM 10</option>
+                <option value="TIM 11">TIM 11</option>
+                <option value="TIM 12">TIM 12</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Paket Broadband</label>
+            <div class="paket-options">
+              <div class="paket-option" data-paket="Up to 25Mb - Rp.111.000,00">
+                Up to 25Mbps - Rp.111.000,00
+              </div>
+              <div
+                class="paket-option"
+                data-paket="Paket Home 1 Up to 50Mb - Rp.166.500,00"
+              >
+                Paket Home 1 Up to 50Mbps - Rp.166.500,00
+              </div>
+              <div
+                class="paket-option"
+                data-paket="Paket Home 2 Up to 75Mb - Rp. 222.000,00"
+              >
+                Paket Home 2 Up to 75Mbps - Rp.222.000,00
+              </div>
+              <div
+                class="paket-option"
+                data-paket="Paket Home 3 Up to 100Mb - Rp.333.000,00"
+              >
+                Paket Home 3 Up to 100Mbps - Rp.333.000,00
+              </div>
+              <div
+                class="paket-option"
+                data-paket="Paket Home 4 Up to 125Mb - Rp.444.000,00"
+              >
+                Paket Home 4 Up to 125Mbps - Rp.444.000,00
+              </div>
+              <div
+                class="paket-option"
+                data-paket="Paket Home 5 Up to 250Mb - Rp.555.000,00"
+              >
+                Paket Home 5 Up to 250Mbps - Rp.555.000,00
+              </div>
+            </div>
+          </div>
+
+          <button class="btn" onclick="generateScript()">
+            Generate Script
+          </button>
+          <button class="btn btn-secondary" onclick="clearForm()">
+            Bersihkan Form
+          </button>
+        </div>
+
+        <!-- Output Area -->
+        <div class="card">
+          <h2>Hasil Output</h2>
+          <div class="output-area" id="output"></div>
+          <button class="btn btn-success" onclick="copyOutput()">
+            Salin ke Clipboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+    <script src="index.js"></script>
+  </body>
+</html>
