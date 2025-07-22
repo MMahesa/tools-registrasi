@@ -1,4 +1,4 @@
- let selectedPaket = '';
+let selectedPaket = '';
 
         // Initialize event listeners
         document.addEventListener('DOMContentLoaded', function() {
@@ -63,55 +63,20 @@
             const odp = document.getElementById('odp').value.trim();
             const teknisi = document.getElementById('teknisi').value;
 
-            // Generate script
-            const timestamp = new Date().toLocaleString('id-ID');
-            const script = `NOC REGISTRATION SCRIPT
-==============================================
-Generated: ${timestamp}
-
-CUSTOMER INFORMATION:
-Name         : ${nama}
-Username     : ${username}
-Password     : ${password}
-
-TECHNICAL INFORMATION:
-Serial Number: ${sn}
-MAC Address  : ${mac}
-Attenuation  : ${redaman} dBm
-VLAN ID      : ${vlan}
-Coordinates  : ${tikor}
-ODP Location : ${odp}
-Tech Team    : ${teknisi}
-
-SERVICE PACKAGE:
-${selectedPaket}
-
-CONFIGURATION SCRIPT:
-==============================================
-# Customer Configuration
-customer add name="${nama}" username="${username}" password="${password}"
-interface bridge add name=vlan${vlan}
-interface vlan add name=vlan${vlan} vlan-id=${vlan} interface=ether1
-ip address add address=192.168.${vlan}.1/24 interface=vlan${vlan}
-
-# MAC Address Binding
-/interface ethernet switch port set 0 vlan-id=${vlan}
-/interface bridge port add bridge=vlan${vlan} interface=ether1
-
-# Quality of Service
-queue simple add name="${nama}_queue" target=${mac} max-limit=${selectedPaket.includes('25Mb') ? '25M/25M' : 
-selectedPaket.includes('50Mb') ? '50M/50M' : 
-selectedPaket.includes('75Mb') ? '75M/75M' : 
-selectedPaket.includes('100Mb') ? '100M/100M' : 
-selectedPaket.includes('125Mb') ? '125M/125M' : '250M/250M'}
-
-# Monitoring
-/tool netwatch add host=192.168.${vlan}.2 comment="${nama}_monitoring"
-
-==============================================
-COMPLETED - Contact: ${teknisi}
-Location: ${odp} | Signal: ${redaman} dBm
-==============================================`;
+            // Generate simplified script for Telegram
+            const script = `**Registrasi Pelanggan Baru**
+Nama: ${nama}
+SN: ${sn}
+MAC Address: ${mac}
+Redaman: ${redaman}
+Username: ${username}
+Password: ${password}
+Vlan: ${vlan}
+Tikor: ${tikor}
+ODP: ${odp}
+Paket: ${selectedPaket}
+Promo: FREE PEMASANGAN
+Teknisi: ${teknisi}`;
 
             document.getElementById('output').textContent = script;
             showNotification('Script berhasil dibuat!');
