@@ -5,42 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registrasi Pelanggan NOC</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>NOC Registration System</h1>
-        <p>Sistem Registrasi Pelanggan </p>
+        <h1>
+          <i class="bi bi-wifi"></i>
+          Registrasi NOC
+        </h1>
+        <p>Sistem Pendaftaran Pelanggan</p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">By Mahesa</p>
+        
+        <div class="mode-selector">
+          <label for="modeSelect">
+            <i class="bi bi-shield-check"></i>
+            Pilih Mode:
+          </label>
+          <select id="modeSelect">
+            <option value="registrasi">Registrasi Pelanggan Baru</option>
+            <option value="gantiModem">Ganti Modem</option>
+          </select>
+        </div>
       </div>
 
       <div class="main-content">
         <!-- Form Input -->
         <div class="card">
-          <h2>Form Registrasi</h2>
+          <h2 id="formTitle">Isi Semua data di bawah ini!</h2>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="nama">Nama Pelanggan</label>
+              <label for="nama">Nama</label>
               <input
                 type="text"
                 id="nama"
-                placeholder="Masukkan nama lengkap"
+                placeholder="Asep"
               />
             </div>
             <div class="form-group">
-              <label for="sn">Nomor Seri</label>
-              <input type="text" id="sn" placeholder="SN123456789" />
+              <label for="sn">SN</label>
+              <input type="text" id="sn" placeholder="Contoh: SN123456789" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="mac">Alamat MAC</label>
-              <input type="text" id="mac" placeholder="00:11:22:33:44:55" />
+              <label for="mac">MAC Address</label>
+              <input type="text" id="mac" placeholder="Format: AA:BB:CC:DD:EE:FF" />
             </div>
             <div class="form-group">
-              <label for="redaman">Redaman (dBm)</label>
-              <input type="text" id="redaman" placeholder="-15.5" />
+              <label for="redaman">Redaman</label>
+              <input type="text" id="redaman" placeholder="Contoh: -18.83 dBm" />
             </div>
           </div>
 
@@ -50,112 +66,127 @@
               <input
                 type="text"
                 id="username"
-                placeholder="Masukkan username"
+                placeholder="Nomor saja, domain otomatis"
               />
             </div>
-            <div class="form-group">
+            <div class="form-group" id="passwordGroup">
               <label for="password">Password</label>
               <input
                 type="text"
                 id="password"
-                placeholder="Masukkan password"
+                placeholder="Kosongkan = default 12345"
               />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="vlan">VLAN ID</label>
-              <input type="text" id="vlan" placeholder="100" />
+              <label for="odp">ODP</label>
+              <select id="odp">
+                <option value="">Pilih ODP</option>
+                <option value="BMY01">BMY01</option>
+                <option value="BMY02">BMY02</option>
+                <option value="BMY03">BMY03</option>
+                <option value="LMO">LMO</option>
+                <option value="CRT">CRT</option>
+                <option value="KND">KND</option>
+                <option value="PGS">PGS</option>
+                <option value="PML">PML</option>
+                <option value="LEWE">LEWE EPON</option>
+                <option value="LEWE-GPON">LEWE GPON</option>
+                <option value="RWG">RWG</option>
+                <option value="SMD01">SMD01</option>
+                <option value="SMD02">SMD02</option>
+                <option value="BLK">BLK</option>
+                <option value="CKD">CKD</option>
+                <option value="DMG">DMG</option>
+                <option value="CRG">CRG</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="tikor">Koordinat</label>
+              <label for="odpCode">Kode ODP</label>
+              <input type="text" id="odpCode" placeholder="Contoh: P01A101/08" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="vlan">Vlan</label>
+              <input type="text" id="vlan" readonly placeholder="Otomatis terisi dari ODP" />
+            </div>
+            <div class="form-group">
+              <label for="tikor">Tikor GPS</label>
               <input
                 type="text"
                 id="tikor"
-                placeholder="-6.123456, 106.789012"
+                placeholder="Format: latitude, longitude"
               />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="odp">Lokasi ODP</label>
-              <input type="text" id="odp" placeholder="ODP-001/1/1" />
-            </div>
-            <div class="form-group">
-              <label for="teknisi">Tim Teknisi</label>
+              <label for="teknisi">Teknisi</label>
               <select id="teknisi">
-                <option value="">Pilih Tim Teknisi</option>
-                <option value="TIM 1">TIM 1</option>
-                <option value="TIM 2">TIM 2</option>
-                <option value="TIM 3">TIM 3</option>
-                <option value="TIM 4">TIM 4</option>
-                <option value="TIM 5">TIM 5</option>
-                <option value="TIM 6">TIM 6</option>
-                <option value="TIM 7">TIM 7</option>
-                <option value="TIM 8">TIM 8</option>
-                <option value="TIM 9">TIM 9</option>
-                <option value="TIM 10">TIM 10</option>
-                <option value="TIM 11">TIM 11</option>
-                <option value="TIM 12">TIM 12</option>
+                <option value="">Pilih Team</option>
+                <option value="Team 1">Team 1</option>
+                <option value="Team 2">Team 2</option>
+                <option value="Team 3">Team 3</option>
+                <option value="Team 4">Team 4</option>
+                <option value="Team 5">Team 5</option>
+                <option value="Team 6">Team 6</option>
+                <option value="Team 7">Team 7</option>
+                <option value="Team 8">Team 8</option>
+                <option value="Team 9">Team 9</option>
+                <option value="Team 10">Team 10 (CIKIDANG)</option>
+                <option value="Team 11">Team 11 (LEWE)</option>
+                <option value="Team 12">Team 12 (Carita)</option>
               </select>
             </div>
-          </div>
-
-          <div class="form-group full-width">
-            <label>Paket Broadband</label>
-            <div class="paket-options">
-              <div class="paket-option" data-paket="Up to 25Mb">
-                Up to 25Mbps 
-              </div>
-              <div
-                class="paket-option"
-                data-paket="Paket Home 1 Up to 50Mb"
-              >
-                Paket Home 1 Up to 50Mbps 
-              </div>
-              <div
-                class="paket-option"
-                data-paket="Paket Home 2 Up to 75Mb"
-              >
-                Paket Home 2 Up to 75Mbps 
-              </div>
-              <div
-                class="paket-option"
-                data-paket="Paket Home 3 Up to 100Mb"
-              >
-                Paket Home 3 Up to 100Mbps
-              </div>
-              <div
-                class="paket-option"
-                data-paket="Paket Home 4 Up to 125Mb"
-              >
-                Paket Home 4 Up to 125Mbps 
-              </div>
-              <div
-                class="paket-option"
-                data-paket="Paket Home 5 Up to 250Mb"
-              >
-                Paket Home 5 Up to 250Mbps 
-              </div>
+            <div class="form-group">
+              <label for="promo">Promo</label>
+              <input type="text" id="promo" value="FREE PEMASANGAN" />
             </div>
           </div>
 
-          <button class="btn" onclick="generateScript()">
+          <div class="form-group full-width" id="paketGroup">
+            <label>Paket Langganan</label>
+            <button type="button" id="paketButton" class="paket-button">
+              <i class="bi bi-box-seam"></i>
+              Pilih Paket
+            </button>
+            <div id="paketDropdown" class="paket-dropdown hidden">
+              <input type="text" id="paketSearch" placeholder="Cari paket...">
+              <div id="paketList" class="paket-list"></div>
+            </div>
+            <input type="text" id="selectedPaket" readonly placeholder="Klik tombol di atas untuk memilih paket">
+          </div>
+
+          <button class="btn btn-primary" id="generateBtn">
+            <i class="bi bi-play-circle"></i>
             Generate Script
           </button>
-          <button class="btn btn-secondary" onclick="clearForm()">
+          <button class="btn btn-secondary" onclick="bersihkanForm()">
+            <i class="bi bi-arrow-clockwise"></i>
             Bersihkan Form
+          </button>
+          <button class="btn btn-success" onclick="salinOutput()">
+            <i class="bi bi-clipboard"></i>
+            Copy ke Clipboard
+          </button>
+          <button class="btn btn-print" onclick="cetakHasil()">
+            <i class="bi bi-printer"></i>
+            Cetak
           </button>
         </div>
 
         <!-- Output Area -->
         <div class="card">
-          <h2>Hasil Output</h2>
+          <h2>Hasil Registrasi</h2>
           <div class="output-area" id="output"></div>
-          <button class="btn btn-success" onclick="copyOutput()">
-            Salin ke Clipboard
+          <button class="btn btn-success" onclick="salinOutput()">
+            <i class="bi bi-clipboard"></i>
+            Copy
           </button>
         </div>
       </div>
