@@ -157,25 +157,28 @@ Tools Registrasi adalah aplikasi web berbasis HTML/CSS/JavaScript yang dirancang
 
 ### 📍 Tambah ODP Location
 
-Edit file `index.html` untuk daftar ODP, lalu `index.js` untuk VLAN mapping:
+Edit file `config.js`:
 ```javascript
-const odpVlanMapping = {
-    'EXISTING_ODP': 10,
-    'NEW_LOCATION': 20,  // Tambah ODP baru
-    'ANOTHER_ONE': 30   // Tambah VLAN mapping
+window.APP_CONFIG = {
+    odpOptions: [
+        { value: 'EXISTING_ODP', label: 'EXISTING_ODP', vlan: 10 },
+        { value: 'NEW_LOCATION', label: 'NEW_LOCATION', vlan: 20 }
+    ]
 };
 ```
 
 ### 📦 Modifikasi Package List
 
-Update array `paketOptions`:
+Update `paketOptions` di `config.js`:
 ```javascript
-const paketOptions = [
-    'Paket UP TO 25 Mbps',
-    'Paket UP TO 50 Mbps',
-    'Paket UP TO 100 Mbps',  // Tambah package baru
-    'Paket UP TO 200 Mbps'
-];
+window.APP_CONFIG = {
+    paketOptions: [
+        'Paket UP TO 25 Mbps',
+        'Paket UP TO 50 Mbps',
+        'Paket UP TO 100 Mbps',
+        'Paket UP TO 200 Mbps'
+    ]
+};
 ```
 
 ### 🎨 Theme Customization
@@ -196,6 +199,7 @@ Edit CSS variables di `styles.css`:
 
 ```
 tools-registrasi/
+├── ⚙️ config.js           # Data ODP, paket, dan quick access
 ├── 📄 index.html          # Main HTML structure
 ├── 🎨 styles.css          # Complete styling with dark theme
 ├── ⚡ index.js           # All JavaScript functionality

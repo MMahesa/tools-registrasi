@@ -31,8 +31,16 @@
 
       <div class="main-content">
         <!-- Form Input -->
-        <div class="card">
+        <div class="card form-card">
           <h2 id="formTitle">Isi Semua data di bawah ini!</h2>
+
+          <div class="ops-bar">
+            <div class="ops-badge">
+              <i class="bi bi-lightning-charge"></i>
+              Operasional Cepat
+            </div>
+            <div class="ops-hint">Cari ODP, generate, lalu copy hasil tanpa pindah-pindah.</div>
+          </div>
 
           <div class="form-row">
             <div class="form-group">
@@ -82,6 +90,13 @@
           <div class="form-row">
             <div class="form-group">
               <label for="odp">ODP</label>
+              <input
+                type="text"
+                id="odpSearch"
+                class="search-input"
+                placeholder="Cari ODP: BMY, PMG, LEWE..."
+              />
+              <div id="quickOdpChips" class="quick-chips"></div>
               <select id="odp">
                 <option value="">Pilih ODP</option>
               </select>
@@ -145,37 +160,42 @@
             <input type="text" id="selectedPaket" readonly placeholder="Klik tombol di atas untuk memilih paket">
           </div>
 
-          <button class="btn btn-primary" id="generateBtn">
-            <i class="bi bi-play-circle"></i>
-            Generate Script
-          </button>
-          <button class="btn btn-secondary" onclick="bersihkanForm()">
-            <i class="bi bi-arrow-clockwise"></i>
-            Bersihkan Form
-          </button>
-          <button class="btn btn-success" onclick="salinOutput()">
-            <i class="bi bi-clipboard"></i>
-            Copy ke Clipboard
-          </button>
-          <button class="btn btn-print" onclick="cetakHasil()">
-            <i class="bi bi-printer"></i>
-            Cetak
-          </button>
+          <div class="action-grid">
+            <button class="btn btn-primary btn-strong" id="generateBtn">
+              <i class="bi bi-play-circle"></i>
+              Generate Script
+            </button>
+            <button class="btn btn-success" onclick="salinOutput()">
+              <i class="bi bi-clipboard"></i>
+              Copy ke Clipboard
+            </button>
+            <button class="btn btn-secondary" onclick="bersihkanForm()">
+              <i class="bi bi-arrow-clockwise"></i>
+              Bersihkan Form
+            </button>
+            <button class="btn btn-print" onclick="cetakHasil()">
+              <i class="bi bi-printer"></i>
+              Cetak
+            </button>
+          </div>
         </div>
 
         <!-- Output Area -->
-        <div class="card">
+        <div class="card output-card">
           <h2>Hasil Registrasi</h2>
           <div class="output-area" id="output"></div>
-          <button class="btn btn-success" onclick="salinOutput()">
-            <i class="bi bi-clipboard"></i>
-            Copy
-          </button>
+          <div class="output-actions">
+            <button class="btn btn-success" onclick="salinOutput()">
+              <i class="bi bi-clipboard"></i>
+              Copy
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="notification" id="notification"></div>
+    <script src="config.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

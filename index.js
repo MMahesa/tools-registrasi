@@ -1,53 +1,58 @@
 let selectedPaket = '';
 const storageKey = 'tools-registrasi-preferences';
+const { paketOptions = [], odpOptions = [], quickOdp = [] } = window.APP_CONFIG || {};
+const odpVlanMapping = Object.fromEntries(odpOptions.map((odp) => [odp.value, odp.vlan]));
 
-const paketOptions = [
-    'Paket UP TO 25 Mbps',
-    'Paket UP TO 50 Mbps',
-    'Paket UP TO 75 Mbps',
-    'Paket UP TO 100 Mbps',
-    'Paket UP TO 125 Mbps'
-];
-
-const odpOptions = [
-    { value: 'BMY01', label: 'BMY01', vlan: 20 },
-    { value: 'BMY02', label: 'BMY02', vlan: 20 },
-    { value: 'BMY03', label: 'BMY03', vlan: 20 },
-    { value: 'BMY04', label: 'BMY04', vlan: 20 },
-    { value: 'LMO', label: 'LMO', vlan: 10 },
-    { value: 'CRT', label: 'CRT', vlan: 10 },
-    { value: 'KND', label: 'KND', vlan: 10 },
-    { value: 'PGS', label: 'PGS', vlan: 50 },
-    { value: 'PMG', label: 'PMG', vlan: 50 },
-    { value: 'LEWE', label: 'LEWE EPON', vlan: 10 },
-    { value: 'LEWE-GPON', label: 'LEWE GPON', vlan: 50 },
-    { value: 'RWG', label: 'RWG', vlan: 50 },
-    { value: 'SMD01', label: 'SMD01', vlan: 10 },
-    { value: 'SMD02', label: 'SMD02', vlan: 10 },
-    { value: 'BLK', label: 'BLK', vlan: 50 },
-    { value: 'CKD', label: 'CKD', vlan: 10 },
-    { value: 'DMG', label: 'DMG', vlan: 10 },
-    { value: 'CRG', label: 'CRG', vlan: 50 }
-];
-
-const odpVlanMapping = Object.fromEntries(
-    odpOptions.map((odp) => [odp.value, odp.vlan])
-);
-
-function renderOdpOptions() {
+function renderOdpOptions(filter = '') {
     const odpSelect = document.getElementById('odp');
+    const normalizedFilter = filter.trim().toLowerCase();
+    const filteredOptions = odpOptions.filter((odp) => {
+        const label = `${odp.value} ${odp.label}`.toLowerCase();
+        return label.includes(normalizedFilter);
+    });
 
     odpSelect.innerHTML = [
         '<option value="">Pilih ODP</option>',
-        ...odpOptions.map((odp) => `<option value="${odp.value}">${odp.label}</option>`)
+        ...filteredOptions.map((odp) => `<option value="${odp.value}">${odp.label}</option>`)
     ].join('');
+}
+
+function renderQuickOdpChips() {
+    const container = document.getElementById('quickOdpChips');
+    const chips = quickOdp.filter((code) => odpOptions.some((odp) => odp.value === code));
+
+    container.innerHTML = chips.map((code) => (
+        `<button type="button" class="quick-chip" data-odp="${code}">${code}</button>`
+    )).join('');
+
+    container.querySelectorAll('.quick-chip').forEach((chip) => {
+        chip.addEventListener('click', function() {
+            const odpValue = this.getAttribute('data-odp');
+            document.getElementById('odpSearch').value = '';
+            renderOdpOptions();
+            document.getElementById('odp').value = odpValue;
+            sinkronkanVlanDariOdp(odpValue);
+            fokuskanFieldBerikutnya();
+        });
+    });
+}
+
+function sinkronkanVlanDariOdp(selectedODP) {
+    const vlanField = document.getElementById('vlan');
+    vlanField.value = selectedODP && odpVlanMapping[selectedODP] ? odpVlanMapping[selectedODP] : '';
+}
+
+function fokuskanFieldBerikutnya() {
+    document.getElementById('odpCode').focus();
 }
 
 function simpanPreferensi() {
     const preferences = {
         mode: document.getElementById('modeSelect').value,
         teknisi: document.getElementById('teknisi').value,
-        promo: document.getElementById('promo').value.trim()
+        promo: document.getElementById('promo').value.trim(),
+        odp: document.getElementById('odp').value,
+        paket: selectedPaket
     };
 
     localStorage.setItem(storageKey, JSON.stringify(preferences));
@@ -73,175 +78,71 @@ function muatPreferensi() {
         if (preferences.promo) {
             document.getElementById('promo').value = preferences.promo;
         }
+
+        if (preferences.odp) {
+            renderOdpOptions();
+            document.getElementById('odp').value = preferences.odp;
+            sinkronkanVlanDariOdp(preferences.odp);
+        }
+
+        if (preferences.paket) {
+            selectedPaket = preferences.paket;
+            document.getElementById('selectedPaket').value = preferences.paket;
+        }
     } catch (error) {
         localStorage.removeItem(storageKey);
     }
 }
 
-// Initialize event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    renderOdpOptions();
-    muatPreferensi();
-
-    // Initialize paket dropdown
-    const paketButton = document.getElementById('paketButton');
-    const paketDropdown = document.getElementById('paketDropdown');
-    const paketSearch = document.getElementById('paketSearch');
+function tampilkanDaftarPaket(filter = '') {
     const paketList = document.getElementById('paketList');
+    const filteredPaket = paketOptions.filter((paket) =>
+        paket.toLowerCase().includes(filter.toLowerCase())
+    );
 
-    // Populate paket list
-    function tampilkanDaftarPaket(filter = '') {
-        const filteredPaket = paketOptions.filter(paket => 
-            paket.toLowerCase().includes(filter.toLowerCase())
-        );
-        
-        paketList.innerHTML = filteredPaket.map(paket => 
-            `<div class="paket-item" data-paket="${paket}">${paket}</div>`
-        ).join('');
+    paketList.innerHTML = filteredPaket.map((paket) =>
+        `<div class="paket-item" data-paket="${paket}">${paket}</div>`
+    ).join('');
 
-        // Add click handlers to paket items
-        document.querySelectorAll('.paket-item').forEach(item => {
-            item.addEventListener('click', function() {
-                selectedPaket = this.getAttribute('data-paket');
-                document.getElementById('selectedPaket').value = selectedPaket;
-                paketDropdown.classList.add('hidden');
-                paketSearch.value = '';
-            });
+    document.querySelectorAll('.paket-item').forEach((item) => {
+        item.addEventListener('click', function() {
+            selectedPaket = this.getAttribute('data-paket');
+            document.getElementById('selectedPaket').value = selectedPaket;
+            document.getElementById('paketDropdown').classList.add('hidden');
+            document.getElementById('paketSearch').value = '';
+            simpanPreferensi();
         });
+    });
+}
+
+function aturModeForm(mode) {
+    const formTitle = document.getElementById('formTitle');
+    const generateBtn = document.getElementById('generateBtn');
+    const passwordGroup = document.getElementById('passwordGroup');
+    const paketGroup = document.getElementById('paketGroup');
+    const promoGroup = document.querySelector('label[for="promo"]').parentElement;
+
+    if (mode === 'gantiModem') {
+        formTitle.textContent = 'Formulir Ganti Modem';
+        generateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Generate Script Ganti Modem';
+        passwordGroup.style.display = 'none';
+        paketGroup.style.display = 'none';
+        promoGroup.style.display = 'none';
+        document.getElementById('password').value = '';
+    } else {
+        formTitle.textContent = 'Formulir Registrasi Pelanggan Baru';
+        generateBtn.innerHTML = '<i class="bi bi-play-circle"></i> Generate Script Registrasi';
+        passwordGroup.style.display = 'block';
+        paketGroup.style.display = 'block';
+        promoGroup.style.display = 'block';
     }
+}
 
-    tampilkanDaftarPaket();
-
-    // Toggle dropdown
-    paketButton.addEventListener('click', function() {
-        paketDropdown.classList.toggle('hidden');
-        if (!paketDropdown.classList.contains('hidden')) {
-            paketSearch.focus();
-        }
-    });
-
-    // Search functionality
-    paketSearch.addEventListener('input', function() {
-        tampilkanDaftarPaket(this.value);
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.form-group')) {
-            paketDropdown.classList.add('hidden');
-        }
-    });
-
-    // ODP change handler
-    document.getElementById('odp').addEventListener('change', function() {
-        const selectedODP = this.value;
-        const vlanField = document.getElementById('vlan');
-        
-        if (selectedODP && odpVlanMapping[selectedODP]) {
-            vlanField.value = odpVlanMapping[selectedODP];
-        } else {
-            vlanField.value = '';
-        }
-    });
-
-    // Username auto-format
-    document.getElementById('username').addEventListener('blur', function() {
-        let value = this.value.trim();
-        if (value && !value.includes('@')) {
-            this.value = value + '@harmonika.id';
-        }
-    });
-
-    // Redaman auto-format
-    document.getElementById('redaman').addEventListener('blur', function() {
-        let value = this.value.trim();
-        if (value) {
-            // Remove existing - if present
-            value = value.replace(/^-/, '');
-            // Add - at the beginning
-            value = '-' + value;
-            // Add dBm if not present
-            if (!value.toLowerCase().includes('dbm')) {
-                value = value + ' dBm';
-            }
-            this.value = value;
-        }
-    });
-
-    // Password default
-    document.getElementById('password').addEventListener('blur', function() {
-        if (!this.value.trim()) {
-            this.value = '12345';
-        }
-    });
-
-    // MAC address formatting
-    document.getElementById('mac').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/[^a-fA-F0-9]/g, '');
-        
-        // Add colon after every 2 characters
-        if (value.length > 2) {
-            value = value.match(/.{1,2}/g).join(':');
-        }
-        
-        // Limit to MAC address length (17 characters with colons)
-        if (value.length > 17) {
-            value = value.substring(0, 17);
-        }
-        
-        e.target.value = value;
-    });
-
-    // Mode selector handler
-    document.getElementById('modeSelect').addEventListener('change', function() {
-        const mode = this.value;
-        const formTitle = document.getElementById('formTitle');
-        const generateBtn = document.getElementById('generateBtn');
-        const passwordGroup = document.getElementById('passwordGroup');
-        const paketGroup = document.getElementById('paketGroup');
-        const promoGroup = document.querySelector('label[for="promo"]').parentElement;
-        
-        if (mode === 'gantiModem') {
-            formTitle.textContent = 'Formulir Ganti Modem';
-            generateBtn.innerHTML = 'Generate Script Ganti Modem';
-            passwordGroup.style.display = 'none';
-            paketGroup.style.display = 'none';
-            promoGroup.style.display = 'none';
-            // Clear password field for ganti modem mode
-            document.getElementById('password').value = '';
-        } else {
-            formTitle.textContent = 'Formulir Registrasi Pelanggan Baru';
-            generateBtn.innerHTML = 'Generate Script Registrasi';
-            passwordGroup.style.display = 'block';
-            paketGroup.style.display = 'block';
-            promoGroup.style.display = 'block';
-        }
-
-        simpanPreferensi();
-    });
-
-    document.getElementById('teknisi').addEventListener('change', simpanPreferensi);
-    document.getElementById('promo').addEventListener('blur', simpanPreferensi);
-
-    // Generate button handler
-    document.getElementById('generateBtn').addEventListener('click', function() {
-        const mode = document.getElementById('modeSelect').value;
-        if (mode === 'gantiModem') {
-            buatScriptGantiModem();
-        } else {
-            buatScriptRegistrasi();
-        }
-    });
-
-    document.getElementById('modeSelect').dispatchEvent(new Event('change'));
-});
-
-        function buatScriptGantiModem() {
-    // Validasi form untuk ganti modem
+function buatScriptGantiModem() {
     const requiredFields = ['nama', 'sn', 'mac', 'redaman', 'vlan', 'tikor', 'odp', 'teknisi'];
     const missingFields = [];
-    
-    for (let field of requiredFields) {
+
+    for (const field of requiredFields) {
         const value = document.getElementById(field).value.trim();
         if (!value) {
             missingFields.push(field);
@@ -253,25 +154,21 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Get values
     const nama = document.getElementById('nama').value.trim();
     const sn = document.getElementById('sn').value.trim();
     const mac = document.getElementById('mac').value.trim();
     const redaman = document.getElementById('redaman').value.trim();
     const userInput = document.getElementById('username').value.trim().replace('@harmonika.id', '');
-    const username = userInput ? userInput + '@harmonika.id' : '@harmonika.id';
+    const username = userInput ? `${userInput}@harmonika.id` : '@harmonika.id';
     const password = '12345';
     const vlan = document.getElementById('vlan').value.trim();
     const tikor = document.getElementById('tikor').value.trim();
     const odp = document.getElementById('odp').value.trim();
     const odpCode = document.getElementById('odpCode').value.trim();
     const teknisi = document.getElementById('teknisi').value;
-    
-    // Combine ODP and ODP code
     const odpFull = odpCode ? `${odp} ${odpCode}` : odp;
     const paket = 'Paket UP TO 50Mbps';
 
-    // Generate script untuk Ganti Modem
     const script = `**Ganti Modem**
 Nama: ${nama}
 SN: ${sn}
@@ -287,17 +184,14 @@ Teknisi: ${teknisi}`;
 
     document.getElementById('output').textContent = script;
     tampilkanNotifikasi('Script ganti modem berhasil dibuat!');
-    
-    // Scroll to output
     document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
 }
 
 function buatScriptRegistrasi() {
-    // Validasi form
     const requiredFields = ['nama', 'sn', 'mac', 'redaman', 'username', 'password', 'vlan', 'tikor', 'odp', 'teknisi'];
     const missingFields = [];
-    
-    for (let field of requiredFields) {
+
+    for (const field of requiredFields) {
         const value = document.getElementById(field).value.trim();
         if (!value) {
             missingFields.push(field);
@@ -313,7 +207,6 @@ function buatScriptRegistrasi() {
         return;
     }
 
-    // Get values
     const nama = document.getElementById('nama').value.trim();
     const sn = document.getElementById('sn').value.trim();
     const mac = document.getElementById('mac').value.trim();
@@ -326,11 +219,8 @@ function buatScriptRegistrasi() {
     const odpCode = document.getElementById('odpCode').value.trim();
     const teknisi = document.getElementById('teknisi').value;
     const promo = document.getElementById('promo').value.trim() || 'FREE PEMASANGAN';
-
-    // Combine ODP and ODP code
     const odpFull = odpCode ? `${odp} ${odpCode}` : odp;
 
-    // Generate script untuk Telegram
     const script = `**Registrasi Pelanggan Baru**
 Nama: ${nama}
 SN: ${sn}
@@ -347,8 +237,6 @@ Teknisi: ${teknisi}`;
 
     document.getElementById('output').textContent = script;
     tampilkanNotifikasi('Script registrasi berhasil dibuat!');
-    
-    // Scroll to output
     document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -357,41 +245,35 @@ function bersihkanForm() {
         return;
     }
 
-    // Clear all inputs
-    document.querySelectorAll('input').forEach(input => {
+    document.querySelectorAll('input').forEach((input) => {
         input.value = '';
     });
-    
-    // Reset default values
+
     document.getElementById('promo').value = 'FREE PEMASANGAN';
     document.getElementById('teknisi').value = '';
+    document.getElementById('odpSearch').value = '';
     document.getElementById('output').textContent = '';
-    
-    // Clear selected package
+    document.getElementById('selectedPaket').value = '';
     selectedPaket = '';
-    
-    // Reset mode selector to registrasi
+
+    renderOdpOptions();
     document.getElementById('modeSelect').value = 'registrasi';
-    
-    // Trigger mode change to reset form visibility
-    document.getElementById('modeSelect').dispatchEvent(new Event('change'));
-    
+    aturModeForm('registrasi');
+    simpanPreferensi();
     tampilkanNotifikasi('Form berhasil dibersihkan!');
 }
 
 function salinOutput() {
     const output = document.getElementById('output').textContent;
-    
+
     if (!output.trim()) {
         tampilkanNotifikasi('Tidak ada output untuk disalin!', 'error');
         return;
     }
 
-    // Copy to clipboard
     navigator.clipboard.writeText(output).then(() => {
         tampilkanNotifikasi('Output berhasil disalin ke clipboard!');
     }).catch(() => {
-        // Fallback for older browsers
         const textArea = document.createElement('textarea');
         textArea.value = output;
         document.body.appendChild(textArea);
@@ -404,7 +286,7 @@ function salinOutput() {
 
 function cetakHasil() {
     const output = document.getElementById('output').textContent;
-    
+
     if (!output.trim()) {
         tampilkanNotifikasi('Tidak ada output untuk dicetak!', 'error');
         return;
@@ -414,36 +296,143 @@ function cetakHasil() {
 }
 
 function tampilkanNotifikasi(pesan, tipe = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = pesan;
-            notification.className = `notification ${tipe}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-    }
+    const notification = document.getElementById('notification');
+    notification.textContent = pesan;
+    notification.className = `notification ${tipe}`;
+    notification.classList.add('show');
 
-    // Add keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            const mode = document.getElementById('modeSelect').value;
-            if (mode === 'gantiModem') {
-                buatScriptGantiModem();
-            } else {
-                buatScriptRegistrasi();
-            }
-        } else if (e.ctrlKey && e.key === 'c' && e.shiftKey) {
-            salinOutput();
-        } else if (e.ctrlKey && e.key === 'g') {
-            const mode = document.getElementById('modeSelect').value;
-            if (mode === 'gantiModem') {
-                buatScriptGantiModem();
-            } else {
-                buatScriptRegistrasi();
-            }
-        } else if (e.ctrlKey && e.key === 'r') {
-            e.preventDefault();
-            bersihkanForm();
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const paketButton = document.getElementById('paketButton');
+    const paketDropdown = document.getElementById('paketDropdown');
+    const paketSearch = document.getElementById('paketSearch');
+    const odpSearch = document.getElementById('odpSearch');
+    const odpSelect = document.getElementById('odp');
+    const modeSelect = document.getElementById('modeSelect');
+
+    renderOdpOptions();
+    renderQuickOdpChips();
+    muatPreferensi();
+    tampilkanDaftarPaket();
+
+    paketButton.addEventListener('click', function() {
+        paketDropdown.classList.toggle('hidden');
+        if (!paketDropdown.classList.contains('hidden')) {
+            paketSearch.focus();
         }
     });
+
+    paketSearch.addEventListener('input', function() {
+        tampilkanDaftarPaket(this.value);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.form-group')) {
+            paketDropdown.classList.add('hidden');
+        }
+    });
+
+    odpSearch.addEventListener('input', function() {
+        const currentValue = odpSelect.value;
+        renderOdpOptions(this.value);
+        if (Array.from(odpSelect.options).some((option) => option.value === currentValue)) {
+            odpSelect.value = currentValue;
+        }
+    });
+
+    odpSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (odpSelect.options.length > 1) {
+                odpSelect.selectedIndex = 1;
+                sinkronkanVlanDariOdp(odpSelect.value);
+                simpanPreferensi();
+                fokuskanFieldBerikutnya();
+            }
+        }
+    });
+
+    odpSelect.addEventListener('change', function() {
+        sinkronkanVlanDariOdp(this.value);
+        simpanPreferensi();
+    });
+
+    document.getElementById('username').addEventListener('blur', function() {
+        const value = this.value.trim();
+        if (value && !value.includes('@')) {
+            this.value = `${value}@harmonika.id`;
+        }
+    });
+
+    document.getElementById('redaman').addEventListener('blur', function() {
+        let value = this.value.trim();
+        if (value) {
+            value = value.replace(/^-/, '');
+            value = `-${value}`;
+            if (!value.toLowerCase().includes('dbm')) {
+                value = `${value} dBm`;
+            }
+            this.value = value;
+        }
+    });
+
+    document.getElementById('password').addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            this.value = '12345';
+        }
+    });
+
+    document.getElementById('mac').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^a-fA-F0-9]/g, '');
+        if (value.length > 2) {
+            value = value.match(/.{1,2}/g).join(':');
+        }
+        if (value.length > 17) {
+            value = value.substring(0, 17);
+        }
+        e.target.value = value;
+    });
+
+    modeSelect.addEventListener('change', function() {
+        aturModeForm(this.value);
+        simpanPreferensi();
+    });
+
+    document.getElementById('teknisi').addEventListener('change', simpanPreferensi);
+    document.getElementById('promo').addEventListener('blur', simpanPreferensi);
+
+    document.getElementById('generateBtn').addEventListener('click', function() {
+        if (modeSelect.value === 'gantiModem') {
+            buatScriptGantiModem();
+        } else {
+            buatScriptRegistrasi();
+        }
+    });
+
+    aturModeForm(modeSelect.value);
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        if (document.getElementById('modeSelect').value === 'gantiModem') {
+            buatScriptGantiModem();
+        } else {
+            buatScriptRegistrasi();
+        }
+    } else if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+        salinOutput();
+    } else if (e.ctrlKey && e.key === 'g') {
+        if (document.getElementById('modeSelect').value === 'gantiModem') {
+            buatScriptGantiModem();
+        } else {
+            buatScriptRegistrasi();
+        }
+    } else if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        bersihkanForm();
+    }
+});
