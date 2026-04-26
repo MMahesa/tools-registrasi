@@ -157,7 +157,7 @@ Tools Registrasi adalah aplikasi web berbasis HTML/CSS/JavaScript yang dirancang
 
 ### 📍 Tambah ODP Location
 
-Edit file `index.js`:
+Edit file `index.html` untuk daftar ODP, lalu `index.js` untuk VLAN mapping:
 ```javascript
 const odpVlanMapping = {
     'EXISTING_ODP': 10,

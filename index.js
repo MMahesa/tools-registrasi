@@ -1,4 +1,5 @@
 let selectedPaket = '';
+const storageKey = 'tools-registrasi-preferences';
 
 const paketOptions = [
     'Paket UP TO 25 Mbps',
@@ -8,28 +9,80 @@ const paketOptions = [
     'Paket UP TO 125 Mbps'
 ];
 
-const odpVlanMapping = {
-    'LEWE': 10,
-    'LEWE-GPON': 50,
-    'LMO': 10,
-    'KND': 10,
-    'CRT': 10,
-    'SMD01': 10,
-    'SMD02': 10,
-    'CKD': 10,
-    'DMG': 10,
-    'PGS': 50,
-    'RWG': 50,
-    'BLK': 50,
-    'CRG': 50,
-    'PML': 50,
-    'BMY01': 20,
-    'BMY02': 20,
-    'BMY03': 20
-};
+const odpOptions = [
+    { value: 'BMY01', label: 'BMY01', vlan: 20 },
+    { value: 'BMY02', label: 'BMY02', vlan: 20 },
+    { value: 'BMY03', label: 'BMY03', vlan: 20 },
+    { value: 'BMY04', label: 'BMY04', vlan: 20 },
+    { value: 'LMO', label: 'LMO', vlan: 10 },
+    { value: 'CRT', label: 'CRT', vlan: 10 },
+    { value: 'KND', label: 'KND', vlan: 10 },
+    { value: 'PGS', label: 'PGS', vlan: 50 },
+    { value: 'PMG', label: 'PMG', vlan: 50 },
+    { value: 'LEWE', label: 'LEWE EPON', vlan: 10 },
+    { value: 'LEWE-GPON', label: 'LEWE GPON', vlan: 50 },
+    { value: 'RWG', label: 'RWG', vlan: 50 },
+    { value: 'SMD01', label: 'SMD01', vlan: 10 },
+    { value: 'SMD02', label: 'SMD02', vlan: 10 },
+    { value: 'BLK', label: 'BLK', vlan: 50 },
+    { value: 'CKD', label: 'CKD', vlan: 10 },
+    { value: 'DMG', label: 'DMG', vlan: 10 },
+    { value: 'CRG', label: 'CRG', vlan: 50 }
+];
+
+const odpVlanMapping = Object.fromEntries(
+    odpOptions.map((odp) => [odp.value, odp.vlan])
+);
+
+function renderOdpOptions() {
+    const odpSelect = document.getElementById('odp');
+
+    odpSelect.innerHTML = [
+        '<option value="">Pilih ODP</option>',
+        ...odpOptions.map((odp) => `<option value="${odp.value}">${odp.label}</option>`)
+    ].join('');
+}
+
+function simpanPreferensi() {
+    const preferences = {
+        mode: document.getElementById('modeSelect').value,
+        teknisi: document.getElementById('teknisi').value,
+        promo: document.getElementById('promo').value.trim()
+    };
+
+    localStorage.setItem(storageKey, JSON.stringify(preferences));
+}
+
+function muatPreferensi() {
+    const savedPreferences = localStorage.getItem(storageKey);
+    if (!savedPreferences) {
+        return;
+    }
+
+    try {
+        const preferences = JSON.parse(savedPreferences);
+
+        if (preferences.mode) {
+            document.getElementById('modeSelect').value = preferences.mode;
+        }
+
+        if (preferences.teknisi) {
+            document.getElementById('teknisi').value = preferences.teknisi;
+        }
+
+        if (preferences.promo) {
+            document.getElementById('promo').value = preferences.promo;
+        }
+    } catch (error) {
+        localStorage.removeItem(storageKey);
+    }
+}
 
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    renderOdpOptions();
+    muatPreferensi();
+
     // Initialize paket dropdown
     const paketButton = document.getElementById('paketButton');
     const paketDropdown = document.getElementById('paketDropdown');
@@ -163,7 +216,12 @@ document.addEventListener('DOMContentLoaded', function() {
             paketGroup.style.display = 'block';
             promoGroup.style.display = 'block';
         }
+
+        simpanPreferensi();
     });
+
+    document.getElementById('teknisi').addEventListener('change', simpanPreferensi);
+    document.getElementById('promo').addEventListener('blur', simpanPreferensi);
 
     // Generate button handler
     document.getElementById('generateBtn').addEventListener('click', function() {
@@ -174,6 +232,8 @@ document.addEventListener('DOMContentLoaded', function() {
             buatScriptRegistrasi();
         }
     });
+
+    document.getElementById('modeSelect').dispatchEvent(new Event('change'));
 });
 
         function buatScriptGantiModem() {
